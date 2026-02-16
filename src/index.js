@@ -2,14 +2,19 @@
 import { configDotenv } from "dotenv";
 import mongoose from "mongoose";
 
-import express from "express";
+
 import connectDB from "./Db/Connection.js";
+import { app } from "./app.js";
 
 configDotenv();
 
-const app = express();
 
-connectDB();
+
+
+connectDB().then(()=>{
    app.listen(process.env.PORT,()=>{
-        console.log("Server is Running");
-       })
+console.log("Server is Running");
+   })
+}).catch((err)=>{
+console.log("connection failed" , err)
+});
