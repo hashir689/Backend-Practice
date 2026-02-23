@@ -8,7 +8,6 @@ const UploadOnCloudinary = async (LocalFilePath) => {
       .upload(
         "https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg",
         {
-          public_id: "shoes",
           resource_type: "auto",
         }
       )
