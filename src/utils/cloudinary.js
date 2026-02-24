@@ -21,6 +21,8 @@ const UploadOnCloudinary = async (LocalFilePath) => {
   }
 };
 
+export { UploadOnCloudinary };
+
 // Configuration
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
