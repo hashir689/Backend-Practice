@@ -51,8 +51,38 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "User Registered Successfully"));
 });
 
+const generateRefreshandAccessToken = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforesave: false });
+    return { accessToken, refreshToken };
+  } catch (Error) {
+    throw new ApiError(
+      400,
+      "Something went wrong with generating refresh and access token"
+    );
+  }
+};
+
 const loginUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
+  if (!username && !email) {
+    throw new ApiError(400, "username or email required");
+  }
+  const user = await User.findOne({ $or: [{ email }, { username }] });
+  if (!user) {
+    throw new ApiError(400, "Please register first");
+  }
+  const isPasswordValid = await user.isPasswordCorrect(password);
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Password does not match");
+  }
+  const { refreshToken, accessToken } = await generateRefreshandAccessToken(
+    user._id
+  );
 });
 
 export { registerUser };
