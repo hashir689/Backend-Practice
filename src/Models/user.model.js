@@ -48,8 +48,9 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  // in chai and code tutorial next is passed from function but here i face error thats why i remnove it
+  if (!this.isModified("password")) return; // also that next() call in return so i remove also from here
   this.password = await bcrypt.hash(this.password, 10);
 });
 
