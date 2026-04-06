@@ -202,8 +202,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   if (!fullname || !email) {
     throw new ApiError(400, "All fields are required");
   }
-  const user = User.findByIdAndUpdate(
-    req.user?.id,
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
     {
       $set: {
         fullname: fullname,
@@ -239,6 +239,29 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   ).select("-password");
   return res
     .status(200)
+    .json(new ApiResponse(200, user, "avatar updated successfully"));
+});
+
+const updateUsercoverAvatar = asyncHandler(async (req, res) => {
+  const converAvatarLocalPath = req.file?.path;
+  if (!converAvatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+  const converAvatar = await UploadOnCloudinary(converAvatarLocalPath);
+  if (!converAvatar.url) {
+    throw new ApiError(400, "Error while uploading on avatar");
+  }
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        converAvatar: converAvatar.url,
+      },
+    },
+    { new: true }
+  ).select("-password");
+  return res
+    .status(200)
     .json(new ApiResponse(200, user, "Cover Image updated successfully"));
 });
 
@@ -251,4 +274,5 @@ export {
   getCurrentUser,
   updateAccountDetails,
   updateUserAvatar,
+  updateUsercoverAvatar,
 };
